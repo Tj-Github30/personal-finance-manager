@@ -43,10 +43,11 @@ public class MainController {
         }
     }
 
-    @FXML
-    private void onBudgets() {
-        contentPane.getChildren().setAll(new Label("Budgets View"));
+    @FXML private void onBudgets() throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/budgets.fxml"));
+        contentPane.getChildren().setAll(root);
     }
+
 
     @FXML
     private void onReports() {

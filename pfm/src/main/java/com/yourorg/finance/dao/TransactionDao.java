@@ -93,37 +93,6 @@ public class TransactionDao {
         }
     }
 
-
-//    /** Updates an existing transaction record */
-//    public boolean update(Transaction tx) throws SQLException {
-//        String sql = """
-//      UPDATE transactions
-//         SET date = ?, description = ?, category = ?, amount = ?
-//       WHERE id = ?;
-//      """;
-//
-//        // 1) Flip sign for expenses
-//        double amt = tx.getAmount();
-//        if (!"Income".equalsIgnoreCase(tx.getCategory())) {
-//            amt = -Math.abs(amt);
-//        }
-//
-//        try (Connection conn = ConnectionManager.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(sql)) {
-//            ps.setString(1, tx.getDate().toString());
-//            ps.setString(2, tx.getDescription());
-//            ps.setString(3, tx.getCategory());
-//            ps.setDouble(4, amt);
-//            ps.setInt(5, tx.getId());
-//            boolean ok = ps.executeUpdate() == 1;
-//
-//            // Keep your in‑memory object in sync
-//            if (ok) {
-//                tx.setAmount(amt);
-//            }
-//            return ok;
-//        }
-//    }
     /** Updates an existing transaction record */
     public boolean update(Transaction tx) throws SQLException {
         String sql = """
