@@ -41,6 +41,31 @@ public class TransactionsController {
         descCol.setCellValueFactory(new PropertyValueFactory<>("description"));
         catCol .setCellValueFactory(new PropertyValueFactory<>("category"));
         amtCol .setCellValueFactory(new PropertyValueFactory<>("amount"));
+        // 1b) Custom cell factory for amount:
+        //    show expenses (non‑Income) as negative red, income as positive green
+        amtCol.setCellFactory(col -> new TableCell<Transaction, Double>() {
+            @Override
+            protected void updateItem(Double amount, boolean empty) {
+                super.updateItem(amount, empty);
+                if (empty || amount == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    // lookup the row's Transaction
+                    Transaction tx = getTableView().getItems().get(getIndex());
+                    boolean isIncome = "Income".equalsIgnoreCase(tx.getCategory());
+                    double display = isIncome ? amount : -amount;
+                    // format and color
+                    if (isIncome) {
+                        setText(String.format("$%.2f", display));
+                        setStyle("-fx-text-fill: green;");
+                    } else {
+                        setText(String.format("-$%.2f", Math.abs(display)));
+                        setStyle("-fx-text-fill: red;");
+                    }
+                }
+            }
+        });
 
         // 2) Bind our one list to the table
         table.setItems(data);

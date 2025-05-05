@@ -7,6 +7,10 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.SplitPane?>
 <BorderPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.yourorg.finance.controller.DashboardController">
@@ -76,4 +80,33 @@
             </LineChart>
         </HBox>
     </center>
+    <center>
+        <SplitPane orientation="HORIZONTAL">
+            <!-- left: PieChart -->
+            <PieChart fx:id="pieChart" prefWidth="400"/>
+            <!-- right: LineChart -->
+            <LineChart fx:id="lineChart">
+                <xAxis>
+                    <NumberAxis label="Day"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Amount"/>
+                </yAxis>
+            </LineChart>
+        </SplitPane>
+    </center>
+    <bottom>
+        <!-- Recent transactions -->
+        <VBox spacing="5">
+            <Label text="Recent Transactions" style="-fx-font-size:14px;"/>
+            <TableView fx:id="recentTable" prefHeight="180">
+                <columns>
+                    <TableColumn fx:id="dtCol"  text="Date"      prefWidth="100"/>
+                    <TableColumn fx:id="descCol" text="Description" prefWidth="300"/>
+                    <TableColumn fx:id="catCol"  text="Category"  prefWidth="150"/>
+                    <TableColumn fx:id="amtCol" text="Amount" prefWidth="100"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </bottom>
 </BorderPane>
