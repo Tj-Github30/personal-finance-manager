@@ -4,109 +4,73 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.SplitPane?>
+
 <BorderPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.yourorg.finance.controller.DashboardController">
 
-    <!-- Top: Overview cards -->
+    <!-- Top summary cards -->
     <top>
         <HBox spacing="20">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
 
-            <!-- Total Balance Card -->
             <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                <top>
-                    <Label text="Total Balance" style="-fx-font-weight: bold;"/>
-                </top>
-                <center>
-                    <Label fx:id="totalBalanceLabel" style="-fx-font-size: 16px;">
-                        <![CDATA[$0.00]]>
-                    </Label>
-                </center>
+                <top><Label text="Total Balance" style="-fx-font-weight:bold;"/></top>
+                <center><Label fx:id="totalBalanceLabel" style="-fx-font-size:16px;">$0.00</Label></center>
             </BorderPane>
 
-            <!-- Monthly Expenses Card -->
             <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                <top>
-                    <Label text="Monthly Expenses" style="-fx-font-weight: bold;"/>
-                </top>
-                <center>
-                    <Label fx:id="monthlyExpensesLabel" style="-fx-font-size: 16px;">
-                        <![CDATA[$0.00]]>
-                    </Label>
-                </center>
+                <top><Label text="Monthly Expenses" style="-fx-font-weight:bold;"/></top>
+                <center><Label fx:id="monthlyExpensesLabel" style="-fx-font-size:16px;">$0.00</Label></center>
             </BorderPane>
 
-            <!-- Goals Progress Card -->
             <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                <top>
-                    <Label text="Goals Progress" style="-fx-font-weight: bold;"/>
-                </top>
-                <center>
-                    <Label fx:id="goalsProgressLabel" style="-fx-font-size: 16px;">
-                        <![CDATA[0%]]>
-                    </Label>
-                </center>
+                <top><Label text="Goals Progress" style="-fx-font-weight:bold;"/></top>
+                <center><Label fx:id="goalsProgressLabel" style="-fx-font-size:16px;">0%</Label></center>
             </BorderPane>
-
         </HBox>
     </top>
 
-
-    <!-- Center: Charts -->
+    <!-- Center: charts + per‐budget bars -->
     <center>
-        <HBox spacing="20">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
+        <VBox spacing="20">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
 
-            <PieChart fx:id="categoryChart" prefWidth="400" prefHeight="300"/>
-            <LineChart fx:id="trendChart" prefWidth="600" prefHeight="300">
-                <xAxis>
-                    <NumberAxis label="Day"/>
-                </xAxis>
-                <yAxis>
-                    <NumberAxis label="Amount"/>
-                </yAxis>
-            </LineChart>
-        </HBox>
+            <SplitPane orientation="HORIZONTAL">
+                <PieChart fx:id="pieChart" prefWidth="400" prefHeight="300"/>
+                <LineChart fx:id="lineChart" prefWidth="600" prefHeight="300">
+                    <xAxis><NumberAxis label="Day"/></xAxis>
+                    <yAxis><NumberAxis label="Amount"/></yAxis>
+                </LineChart>
+            </SplitPane>
+
+            <VBox fx:id="budgetsBox" spacing="8">
+                <!-- progress bars injected here -->
+            </VBox>
+        </VBox>
     </center>
-    <center>
-        <SplitPane orientation="HORIZONTAL">
-            <!-- left: PieChart -->
-            <PieChart fx:id="pieChart" prefWidth="400"/>
-            <!-- right: LineChart -->
-            <LineChart fx:id="lineChart">
-                <xAxis>
-                    <NumberAxis label="Day"/>
-                </xAxis>
-                <yAxis>
-                    <NumberAxis label="Amount"/>
-                </yAxis>
-            </LineChart>
-        </SplitPane>
-    </center>
+
+    <!-- Bottom: recent transactions -->
     <bottom>
-        <!-- Recent transactions -->
         <VBox spacing="5">
             <Label text="Recent Transactions" style="-fx-font-size:14px;"/>
             <TableView fx:id="recentTable" prefHeight="180">
                 <columns>
-                    <TableColumn fx:id="dtCol"  text="Date"      prefWidth="100"/>
+                    <TableColumn fx:id="dtCol"   text="Date"        prefWidth="100"/>
                     <TableColumn fx:id="descCol" text="Description" prefWidth="300"/>
-                    <TableColumn fx:id="catCol"  text="Category"  prefWidth="150"/>
-                    <TableColumn fx:id="amtCol" text="Amount" prefWidth="100"/>
+                    <TableColumn fx:id="catCol"  text="Category"    prefWidth="150"/>
+                    <TableColumn fx:id="amtCol"  text="Amount"      prefWidth="100"/>
                 </columns>
             </TableView>
         </VBox>
     </bottom>
+
 </BorderPane>

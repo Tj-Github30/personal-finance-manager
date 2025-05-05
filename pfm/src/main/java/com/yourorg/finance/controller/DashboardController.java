@@ -13,11 +13,10 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -52,6 +51,10 @@ public class DashboardController {
     private TableColumn<Transaction, String> catCol;
     @FXML
     private TableColumn<Transaction, Double> amtCol;
+    @FXML private VBox budgetsBox;
+
+//    @FXML private Label goalsProgressLabel;
+
 
     private final TransactionDao txDao = new TransactionDao();
     private final int currentUserId = 1;
@@ -64,6 +67,27 @@ public class DashboardController {
         catCol.setCellValueFactory(new PropertyValueFactory<>("category"));
         amtCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
+        // re‑apply your color cell‑factory:
+        amtCol.setCellFactory(col -> new TableCell<Transaction, Double>() {
+            @Override
+            protected void updateItem(Double amount, boolean empty) {
+                super.updateItem(amount, empty);
+                if (empty || amount==null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    Transaction tx = getTableView().getItems().get(getIndex());
+                    boolean isIncome = "Income".equalsIgnoreCase(tx.getCategory());
+                    if (isIncome) {
+                        setText(String.format("$%.2f", amount));
+                        setStyle("-fx-text-fill: green;");
+                    } else {
+                        setText(String.format("-$%.2f", Math.abs(amount)));
+                        setStyle("-fx-text-fill: red;");
+                    }
+                }
+            }
+        });
 
         // 2) Subscribe to “transaction/budget changed” events
 
@@ -78,116 +102,6 @@ public class DashboardController {
         refreshDashboard();
 
     }
-
-    //    private void refreshDashboard() {
-//        try {
-//            // --- A) load transactions ---
-//            List<Transaction> all = txDao.findByUser(currentUserId);
-//
-//            // A) Total balance
-//            double totalBalance = all.stream()
-//                    .mapToDouble(Transaction::getAmount)
-//                    .sum();
-//
-//            // B) Monthly expenses (non‑income only)
-//            double monthlyExpenses = all.stream()
-//                    .filter(t -> t.getDate().getMonth() == LocalDate.now().getMonth())
-//                    .filter(t -> !"Income".equalsIgnoreCase(t.getCategory()))
-//                    .mapToDouble(t -> Math.abs(t.getAmount()))
-//                    .sum();
-//
-//            // Update the two summary cards
-//            totalBalanceLabel.setText(String.format("$%.2f", totalBalance));
-//            monthlyExpensesLabel.setText(String.format("$%.2f", monthlyExpenses));
-//
-//            // C) Pie chart by category
-//            ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-//            all.stream()
-//                    .collect(Collectors.groupingBy(
-//                            Transaction::getCategory,
-//                            Collectors.summingDouble(Transaction::getAmount)
-//                    ))
-//                    .forEach((cat, sum) ->
-//                            pieData.add(new PieChart.Data(cat, Math.abs(sum)))
-//                    );
-//            pieChart.setData(pieData);
-//
-//            // D) Line chart: daily spending (non‑income)
-//            NumberAxis xAxis = (NumberAxis) lineChart.getXAxis();
-//            NumberAxis yAxis = (NumberAxis) lineChart.getYAxis();
-//            xAxis.setLabel("Day");
-//            yAxis.setLabel("Amount");
-//
-//            XYChart.Series<Number, Number> series = new XYChart.Series<>();
-//            series.setName("Spending");
-//            all.stream()
-//                    .filter(t -> !"Income".equalsIgnoreCase(t.getCategory()))
-//                    .sorted(Comparator.comparing(Transaction::getDate))
-//                    .forEach(t ->
-//                            series.getData().add(new XYChart.Data<>(
-//                                    t.getDate().getDayOfMonth(),
-//                                    Math.abs(t.getAmount())
-//                            ))
-//                    );
-//            lineChart.getData().setAll(series);
-//
-//            // E) Recent transactions (last 5)
-//            List<Transaction> recent = all.stream()
-//                    .sorted(Comparator.comparing(Transaction::getDate).reversed())
-//                    .limit(5)
-//                    .toList();
-//
-//            // custom cell factory for coloring amounts
-//            amtCol.setCellFactory(col -> new TableCell<Transaction, Double>() {
-//                @Override
-//                protected void updateItem(Double amount, boolean empty) {
-//                    super.updateItem(amount, empty);
-//                    if (empty || amount == null) {
-//                        setText(null);
-//                        setStyle("");
-//                    } else {
-//                        Transaction tx = getTableView().getItems().get(getIndex());
-//                        if ("Income".equalsIgnoreCase(tx.getCategory())) {
-//                            setText(String.format("$%.2f", amount));
-//                            setStyle("-fx-text-fill: green;");
-//                        } else {
-//                            setText(String.format("-$%.2f", Math.abs(amount)));
-//                            setStyle("-fx-text-fill: red;");
-//                        }
-//                    }
-//                }
-//            });
-//            recentTable.setItems(FXCollections.observableArrayList(recent));
-//
-//            // F) Goals progress
-//            List<Budget> budgets = new BudgetDao().findByUser(currentUserId);
-//            double totalBudgeted = budgets.stream()
-//                    .mapToDouble(Budget::getLimit)
-//                    .sum();
-//            System.out.println("🎯 [Dashboard] budgets=" + budgets);
-//            System.out.println("🎯 [Dashboard] totalBudgeted=" + totalBudgeted);
-//
-//            // total spent *this month* (absolute of negatives)
-//            double totalSpent = all.stream()
-//                    .filter(t -> t.getDate().getMonth() == LocalDate.now().getMonth())
-//                    .filter(t -> t.getAmount() < 0)
-//                    .mapToDouble(t -> Math.abs(t.getAmount()))
-//                    .sum();
-//
-//            String progressText;
-//            if (totalBudgeted <= 0) {
-//                progressText = "0%";
-//            } else {
-//                int pct = (int) Math.round((totalSpent / totalBudgeted) * 100);
-//                progressText = pct + "%";
-//            }
-//            goalsProgressLabel.setText(progressText);
-//
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//            // optionally show an alert here
-//        }
-//    }
     private void refreshDashboard() {
         try {
             // ─── A) Load all transactions ─────────────────────────────────
@@ -270,126 +184,61 @@ public class DashboardController {
                 progressText = pct + "%";
             }
             goalsProgressLabel.setText(progressText);
+            // ─── F) Per‐budget progress bars ─────────────────────────────────
+
+            budgetsBox.getChildren().clear();
+            for (Budget b : budgets) {
+                double limit = b.getLimit();
+                double spent = all.stream()
+                        .filter(t -> t.getDate().getMonth() == LocalDate.now().getMonth())
+                        .filter(t -> t.getCategory().equalsIgnoreCase(b.getCategory()))
+                        .mapToDouble(t -> Math.abs(t.getAmount()))
+                        .sum();
+
+                double ratio = limit > 0 ? Math.min(1.0, spent / limit) : 0;
+
+                Label catLabel = new Label(b.getCategory());
+                ProgressBar bar   = new ProgressBar(ratio);
+                bar.setPrefWidth(150);
+                Label pctLabel   = new Label(String.format("%d%%", (int)(ratio * 100)));
+
+                HBox row = new HBox(8, catLabel, bar, pctLabel);
+                budgetsBox.getChildren().add(row);
+            }
+
 
         } catch (SQLException ex) {
             ex.printStackTrace();
             // optionally: show an Alert here
         }
-    }
-
-}
-//
-//    private void refreshDashboard() {
+//        // ─── F) Per‐budget progress bars ─────────────────────────────────
+//        List<Budget> budgets;
 //        try {
-//            List<Transaction> all = txDao.findByUser(currentUserId);
+//            budgets = new BudgetDao().findByUser(currentUserId);
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//            budgets = List.of();  // fallback to empty
+//        }
 //
-//            // A) Total balance
-//            double totalBalance = all.stream()
-//                    .mapToDouble(Transaction::getAmount)
-//                    .sum();
-//
-//            // B) Monthly expenses (non‑income only)
-//            double monthlyExpenses = all.stream()
+//        budgetsBox.getChildren().clear();
+//        for (Budget b : budgets) {
+//            double limit = b.getLimit();
+//            double spent = all.stream()
 //                    .filter(t -> t.getDate().getMonth() == LocalDate.now().getMonth())
-//                    .filter(t -> ! "Income".equalsIgnoreCase(t.getCategory()))
+//                    .filter(t -> t.getCategory().equalsIgnoreCase(b.getCategory()))
 //                    .mapToDouble(t -> Math.abs(t.getAmount()))
 //                    .sum();
 //
-//            // Update cards
-//            totalBalanceLabel   .setText(String.format("$%.2f", totalBalance));
-//            monthlyExpensesLabel.setText(String.format("$%.2f", monthlyExpenses));
-//            goalsProgressLabel  .setText("0%");
+//            double ratio = limit > 0 ? Math.min(1.0, spent / limit) : 0;
 //
-//            // C) Pie chart
-//            ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-//            all.stream()
-//                    .collect(Collectors.groupingBy(
-//                            Transaction::getCategory,
-//                            Collectors.summingDouble(Transaction::getAmount)
-//                    ))
-//                    .forEach((cat, sum) ->
-//                            pieData.add(new PieChart.Data(cat, Math.abs(sum)))
-//                    );
-//            pieChart.setData(pieData);
+//            Label catLabel = new Label(b.getCategory());
+//            ProgressBar bar   = new ProgressBar(ratio);
+//            bar.setPrefWidth(150);
+//            Label pctLabel   = new Label(String.format("%d%%", (int)(ratio * 100)));
 //
-//            // D) Line chart
-//            NumberAxis xAxis = (NumberAxis) lineChart.getXAxis();
-//            NumberAxis yAxis = (NumberAxis) lineChart.getYAxis();
-//            xAxis.setLabel("Day");
-//            yAxis.setLabel("Amount");
-//
-//            XYChart.Series<Number, Number> series = new XYChart.Series<>();
-//            series.setName("Spending");
-//            all.stream()
-//                    .filter(t -> ! "Income".equalsIgnoreCase(t.getCategory()))
-//                    .sorted(Comparator.comparing(Transaction::getDate))
-//                    .forEach(t ->
-//                            series.getData().add(new XYChart.Data<>(
-//                                    t.getDate().getDayOfMonth(),
-//                                    Math.abs(t.getAmount())
-//                            ))
-//                    );
-//            lineChart.getData().setAll(series);
-//
-//            // E) Recent transactions
-//            List<Transaction> recent = all.stream()
-//                    .sorted(Comparator.comparing(Transaction::getDate).reversed())
-//                    .limit(5)
-//                    .collect(Collectors.toList());
-//
-//            // custom renderer for coloring +/– amounts
-//            amtCol.setCellFactory(col -> new TableCell<Transaction, Double>() {
-//                @Override
-//                protected void updateItem(Double amount, boolean empty) {
-//                    super.updateItem(amount, empty);
-//                    if (empty || amount == null) {
-//                        setText(null);
-//                        setStyle("");
-//                    } else {
-//                        Transaction tx = getTableView().getItems().get(getIndex());
-//                        if ("Income".equalsIgnoreCase(tx.getCategory())) {
-//                            setText(String.format("$%.2f", amount));
-//                            setStyle("-fx-text-fill: green;");
-//                        } else {
-//                            setText(String.format("-$%.2f", Math.abs(amount)));
-//                            setStyle("-fx-text-fill: red;");
-//                        }
-//                    }
-//                }
-//            });
-//
-//            recentTable.setItems(FXCollections.observableArrayList(recent));
-//
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
+//            HBox row = new HBox(8, catLabel, bar, pctLabel);
+//            budgetsBox.getChildren().add(row);
 //        }
-//        // ─── F) Goals progress ────────────────────────────────
-//        // 1) total budget allocated
-//        List<Budget> budgets = new BudgetDao().findByUser(currentUserId);
-//        double totalBudgeted = budgets.stream()
-//                .mapToDouble(Budget::getLimit)
-//                .sum();
-//
-//        // 2) total spent this month (absolute value of negatives)
-//        double totalSpent = all.stream()
-//                .filter(t -> t.getDate().getMonth() == LocalDate.now().getMonth())
-//                .filter(t -> t.getAmount() < 0)
-//                .mapToDouble(t -> Math.abs(t.getAmount()))
-//                .sum();
-//
-//        // 3) compute percent (guard divide‑by‑zero)
-//        String progressText;
-//        if (totalBudgeted <= 0) {
-//            progressText = "0%";
-//        } else {
-//            int pct = (int) Math.round((totalSpent / totalBudgeted) * 100);
-//            progressText = pct + "%";
-//        }
-//        goalsProgressLabel.setText(progressText);
-//
-//    } catch (SQLException ex) {
-//        ex.printStackTrace();
-//        // you could also pop an Alert here if you like
-//    }
-//    }
-//}
+    }
+
+}
