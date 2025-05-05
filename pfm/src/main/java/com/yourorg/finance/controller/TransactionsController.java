@@ -4,6 +4,7 @@ import com.yourorg.finance.dao.CategoryDao;
 import com.yourorg.finance.dao.TransactionDao;
 import com.yourorg.finance.model.Category;
 import com.yourorg.finance.model.Transaction;
+import com.yourorg.finance.util.EventBus;          // <— import EventBus
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -32,7 +33,6 @@ public class TransactionsController {
     /** The single backing list for the TableView */
     private final ObservableList<Transaction> data =
             FXCollections.observableArrayList();
-    // …
 
     @FXML
     public void initialize() {
@@ -41,8 +41,8 @@ public class TransactionsController {
         descCol.setCellValueFactory(new PropertyValueFactory<>("description"));
         catCol .setCellValueFactory(new PropertyValueFactory<>("category"));
         amtCol .setCellValueFactory(new PropertyValueFactory<>("amount"));
-        // 1b) Custom cell factory for amount:
-        //    show expenses (non‑Income) as negative red, income as positive green
+
+        // 1b) Custom cell factory for amount: expenses in red (-), income in green
         amtCol.setCellFactory(col -> new TableCell<Transaction, Double>() {
             @Override
             protected void updateItem(Double amount, boolean empty) {
@@ -51,11 +51,9 @@ public class TransactionsController {
                     setText(null);
                     setStyle("");
                 } else {
-                    // lookup the row's Transaction
                     Transaction tx = getTableView().getItems().get(getIndex());
                     boolean isIncome = "Income".equalsIgnoreCase(tx.getCategory());
                     double display = isIncome ? amount : -amount;
-                    // format and color
                     if (isIncome) {
                         setText(String.format("$%.2f", display));
                         setStyle("-fx-text-fill: green;");
@@ -133,7 +131,6 @@ public class TransactionsController {
         if (isNew) {
             if (!catList.isEmpty()) catBox.setValue(catList.get(0));
         } else {
-            // pick the matching Category by name
             catList.stream()
                     .filter(c->c.getName().equals(tx.getCategory()))
                     .findFirst()
@@ -207,7 +204,13 @@ public class TransactionsController {
             try {
                 if (isNew) dao.create(t);
                 else        dao.update(t);
+
+                // re‑populate the local table immediately
                 refreshTable();
+
+                // tell the Dashboard to refresh its cards/charts
+                EventBus.get().publish("transactions:changed");
+
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 showAlert("DB Error", ex.getMessage());
@@ -226,6 +229,7 @@ public class TransactionsController {
                 try {
                     dao.delete(tx.getId());
                     refreshTable();
+                    EventBus.get().publish("transactions:changed");
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     showAlert("DB Error", ex.getMessage());

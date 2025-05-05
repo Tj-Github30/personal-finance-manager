@@ -2,6 +2,8 @@ package com.yourorg.finance.controller;
 
 import com.yourorg.finance.dao.TransactionDao;
 import com.yourorg.finance.model.Transaction;
+import com.yourorg.finance.util.EventBus;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -40,7 +42,7 @@ public class DashboardController {
     @FXML private TableColumn<Transaction, Double> amtCol;
 
     private final TransactionDao txDao = new TransactionDao();
-    private final int currentUserId = 1;  // TODO: wire up the real logged‑in user
+    private final int currentUserId = 1;
 
     @FXML
     public void initialize() {
@@ -50,48 +52,51 @@ public class DashboardController {
         catCol .setCellValueFactory(new PropertyValueFactory<>("category"));
         amtCol .setCellValueFactory(new PropertyValueFactory<>("amount"));
 
-        // 2) Load & render everything
+        // 2) Initial render
         refreshDashboard();
+
+        // 3) Subscribe to “transaction changed” events
+        EventBus.get().subscribe(topic -> {
+            if ("transactions:changed".equals(topic)) {
+                Platform.runLater(this::refreshDashboard);
+            }
+        });
     }
 
     private void refreshDashboard() {
         try {
             List<Transaction> all = txDao.findByUser(currentUserId);
 
-            // A) Total balance (sum of all amounts)
+            // A) Total balance
             double totalBalance = all.stream()
                     .mapToDouble(Transaction::getAmount)
                     .sum();
 
-            // B) This‑month expenses (negatives only, absolute value)
+            // B) Monthly expenses (non‑income only)
             double monthlyExpenses = all.stream()
                     .filter(t -> t.getDate().getMonth() == LocalDate.now().getMonth())
-                    // treat positive amounts as expenses if category != Income
-                    .mapToDouble(t -> {
-                        double amt = t.getAmount();
-                        return "Income".equalsIgnoreCase(t.getCategory()) ? 0
-                                : Math.abs(amt);
-                    })
+                    .filter(t -> ! "Income".equalsIgnoreCase(t.getCategory()))
+                    .mapToDouble(t -> Math.abs(t.getAmount()))
                     .sum();
-//            System.out.println("Monthly Expenses: "+ monthlyExpenses);
+
             // Update cards
             totalBalanceLabel   .setText(String.format("$%.2f", totalBalance));
             monthlyExpensesLabel.setText(String.format("$%.2f", monthlyExpenses));
-            goalsProgressLabel  .setText("0%");  // placeholder until budgets are hooked up
+            goalsProgressLabel  .setText("0%");
 
-            // C) Pie chart by category (abs values)
+            // C) Pie chart
             ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
             all.stream()
                     .collect(Collectors.groupingBy(
                             Transaction::getCategory,
                             Collectors.summingDouble(Transaction::getAmount)
                     ))
-                    .forEach((category, sum) ->
-                            pieData.add(new PieChart.Data(category, Math.abs(sum)))
+                    .forEach((cat, sum) ->
+                            pieData.add(new PieChart.Data(cat, Math.abs(sum)))
                     );
             pieChart.setData(pieData);
 
-            // D) Line chart: daily spending (negatives only)
+            // D) Line chart
             NumberAxis xAxis = (NumberAxis) lineChart.getXAxis();
             NumberAxis yAxis = (NumberAxis) lineChart.getYAxis();
             xAxis.setLabel("Day");
@@ -99,29 +104,25 @@ public class DashboardController {
 
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
             series.setName("Spending");
-
-            // D) Line chart: daily spending (negatives only)
             all.stream()
-                    // only build the series from non‑income items
-                    .filter(t -> !"Income".equalsIgnoreCase(t.getCategory()))
+                    .filter(t -> ! "Income".equalsIgnoreCase(t.getCategory()))
                     .sorted(Comparator.comparing(Transaction::getDate))
-                    .forEach(t -> series.getData().add(new XYChart.Data<>(
-                            t.getDate().getDayOfMonth(),
-                            Math.abs(t.getAmount())
-                    )));
-
-
+                    .forEach(t ->
+                            series.getData().add(new XYChart.Data<>(
+                                    t.getDate().getDayOfMonth(),
+                                    Math.abs(t.getAmount())
+                            ))
+                    );
             lineChart.getData().setAll(series);
 
-            // E) Recent transactions: last 5, newest first
+            // E) Recent transactions
             List<Transaction> recent = all.stream()
                     .sorted(Comparator.comparing(Transaction::getDate).reversed())
                     .limit(5)
                     .collect(Collectors.toList());
 
-            // ─────────────────────────────────────────────────────
-            // Apply custom cell factory BEFORE setting items:
-            amtCol.setCellFactory(column -> new TableCell<Transaction, Double>() {
+            // custom renderer for coloring +/– amounts
+            amtCol.setCellFactory(col -> new TableCell<Transaction, Double>() {
                 @Override
                 protected void updateItem(Double amount, boolean empty) {
                     super.updateItem(amount, empty);
@@ -130,8 +131,7 @@ public class DashboardController {
                         setStyle("");
                     } else {
                         Transaction tx = getTableView().getItems().get(getIndex());
-                        boolean isIncome = "Income".equalsIgnoreCase(tx.getCategory());
-                        if (isIncome) {
+                        if ("Income".equalsIgnoreCase(tx.getCategory())) {
                             setText(String.format("$%.2f", amount));
                             setStyle("-fx-text-fill: green;");
                         } else {
@@ -142,13 +142,10 @@ public class DashboardController {
                 }
             });
 
-            // Now populate the table with your recent list
             recentTable.setItems(FXCollections.observableArrayList(recent));
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            // optionally show an Alert here
         }
-
     }
 }
