@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.geometry.Insets?>
-
-<?import javafx.scene.control.Label?>
 
 <BorderPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -19,24 +18,45 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
 
-            <!-- Card placeholders -->
+            <!-- Total Balance Card -->
             <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
+                <top>
+                    <Label text="Total Balance" style="-fx-font-weight: bold;"/>
+                </top>
                 <center>
-                    <Label text="Total Balance: $0.00" />
+                    <Label fx:id="totalBalanceLabel" style="-fx-font-size: 16px;">
+                        <![CDATA[$0.00]]>
+                    </Label>
                 </center>
             </BorderPane>
+
+            <!-- Monthly Expenses Card -->
             <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
+                <top>
+                    <Label text="Monthly Expenses" style="-fx-font-weight: bold;"/>
+                </top>
                 <center>
-                    <Label text="Monthly Expenses: $0.00" />
+                    <Label fx:id="monthlyExpensesLabel" style="-fx-font-size: 16px;">
+                        <![CDATA[$0.00]]>
+                    </Label>
                 </center>
             </BorderPane>
+
+            <!-- Goals Progress Card -->
             <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
+                <top>
+                    <Label text="Goals Progress" style="-fx-font-weight: bold;"/>
+                </top>
                 <center>
-                    <Label text="Goals Progress: 0%" />
+                    <Label fx:id="goalsProgressLabel" style="-fx-font-size: 16px;">
+                        <![CDATA[0%]]>
+                    </Label>
                 </center>
             </BorderPane>
+
         </HBox>
     </top>
+
 
     <!-- Center: Charts -->
     <center>
@@ -46,8 +66,7 @@
             </padding>
 
             <PieChart fx:id="categoryChart" prefWidth="400" prefHeight="300"/>
-            <LineChart fx:id="trendChart"
-                       prefWidth="600" prefHeight="300">
+            <LineChart fx:id="trendChart" prefWidth="600" prefHeight="300">
                 <xAxis>
                     <NumberAxis label="Day"/>
                 </xAxis>

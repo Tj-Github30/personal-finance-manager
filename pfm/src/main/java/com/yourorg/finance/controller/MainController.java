@@ -33,7 +33,14 @@ public class MainController {
 
     @FXML
     private void onTransactions() {
-        contentPane.getChildren().setAll(new Label("Transactions View"));
+        try {
+            Parent txView = FXMLLoader.load(
+                    getClass().getResource("/fxml/transactions.fxml")
+            );
+            contentPane.getChildren().setAll(txView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
