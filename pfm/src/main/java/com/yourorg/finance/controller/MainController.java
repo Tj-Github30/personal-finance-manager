@@ -1,6 +1,8 @@
 package com.yourorg.finance.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
@@ -8,9 +10,26 @@ public class MainController {
     @FXML private StackPane contentPane;
 
     @FXML
-    private void onDashboard() {
-        contentPane.getChildren().setAll(new Label("Dashboard View"));
+    public void initialize() {
+        // load the dashboard view as soon as the main window comes up
+        onDashboard();
     }
+
+    @FXML
+    private void onDashboard() {
+        try {
+            // explicitly load as a Parent (which is a Node)
+            Parent dash = FXMLLoader.load(
+                    getClass().getResource("/fxml/dashboard.fxml")
+            );
+
+            // now you can pass it directly to setAll(...)
+            contentPane.getChildren().setAll(dash);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @FXML
     private void onTransactions() {
