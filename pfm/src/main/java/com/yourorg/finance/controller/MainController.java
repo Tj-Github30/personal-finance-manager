@@ -44,14 +44,27 @@ public class MainController {
     }
 
     @FXML private void onBudgets() throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/budgets.fxml"));
-        contentPane.getChildren().setAll(root);
+        try {
+            Parent txView = FXMLLoader.load(
+                    getClass().getResource("/fxml/budgets.fxml")
+            );
+            contentPane.getChildren().setAll(txView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
     @FXML
     private void onReports() {
-        contentPane.getChildren().setAll(new Label("Reports View"));
+        try {
+            Parent txView = FXMLLoader.load(
+                    getClass().getResource("/fxml/reports.fxml")
+            );
+            contentPane.getChildren().setAll(txView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
