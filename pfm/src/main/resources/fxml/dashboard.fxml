@@ -33,7 +33,7 @@
             </BorderPane>
 
             <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                <top><Label text="Goals Progress" style="-fx-font-weight:bold;"/></top>
+                <top><Label text="Budget Comsumption" style="-fx-font-weight:bold;"/></top>
                 <center><Label fx:id="goalsProgressLabel" style="-fx-font-size:16px;">0%</Label></center>
             </BorderPane>
         </HBox>
