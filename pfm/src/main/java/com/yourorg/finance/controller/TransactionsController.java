@@ -17,6 +17,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TransactionsController {
     @FXML private TableView<Transaction> table;
@@ -25,6 +27,8 @@ public class TransactionsController {
     @FXML private TableColumn<Transaction, String> catCol;
     @FXML private TableColumn<Transaction, Double> amtCol;
     @FXML private Button addBtn, editBtn, delBtn;
+    @FXML private ComboBox<String> monthFilter;
+    @FXML private ComboBox<String> yearFilter;
 
     private final TransactionDao dao    = new TransactionDao();
     private final CategoryDao   catDao = new CategoryDao();
@@ -41,6 +45,19 @@ public class TransactionsController {
         descCol.setCellValueFactory(new PropertyValueFactory<>("description"));
         catCol .setCellValueFactory(new PropertyValueFactory<>("category"));
         amtCol .setCellValueFactory(new PropertyValueFactory<>("amount"));
+        // initialize filters:
+        monthFilter.getItems().setAll(
+                "All","Jan","Feb","Mar","Apr","May","Jun",
+                "Jul","Aug","Sep","Oct","Nov","Dec"
+        );
+        yearFilter.getItems().setAll("All","2023","2024","2025");
+
+        monthFilter.getSelectionModel().select("All");
+        yearFilter.getSelectionModel().select("All");
+
+        // whenever filter changes, reload the table:
+        monthFilter.setOnAction(e -> refreshTable());
+        yearFilter .setOnAction(e -> refreshTable());
 
         // 1b) Custom cell factory for amount: expenses in red (-), income in green
         amtCol.setCellFactory(col -> new TableCell<Transaction, Double>() {
@@ -93,17 +110,46 @@ public class TransactionsController {
         });
     }
 
-    /** Reloads all transactions for the current user */
+    /** Reloads all transactions for the current user, applying month/year filters */
     public void refreshTable() {
         try {
+            // 1) Load everything
             List<Transaction> allTx = dao.findByUser(currentUserId);
-            data.setAll(allTx);
+
+            // 2) Read selections
+            String m = monthFilter.getValue();
+            String y = yearFilter.getValue();
+
+            // 3) Stream‐filter by month/year if not “All”
+            Stream<Transaction> stream = allTx.stream();
+            if (m != null && !"All".equals(m)) {
+                // map “Jan”→1, “Feb”→2, …
+                int monthIdx = List.of(
+                        "Jan","Feb","Mar","Apr","May","Jun",
+                        "Jul","Aug","Sep","Oct","Nov","Dec"
+                ).indexOf(m) + 1;
+                stream = stream.filter(tx ->
+                        tx.getDate().getMonthValue() == monthIdx
+                );
+            }
+            if (y != null && !"All".equals(y)) {
+                int year = Integer.parseInt(y);
+                stream = stream.filter(tx ->
+                        tx.getDate().getYear() == year
+                );
+            }
+
+            // 4) Collect & bind
+            List<Transaction> filtered = stream.collect(Collectors.toList());
+            data.setAll(filtered);
             table.refresh();
+
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("DB Error", e.getMessage());
         }
     }
+
 
     /** Shows a dialog to add or edit a transaction */
     private void showTransactionDialog(Transaction tx) {

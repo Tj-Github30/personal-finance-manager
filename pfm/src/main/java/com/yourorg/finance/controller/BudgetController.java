@@ -2,6 +2,7 @@ package com.yourorg.finance.controller;
 
 import com.yourorg.finance.dao.BudgetDao;
 import com.yourorg.finance.dao.CategoryDao;
+import com.yourorg.finance.dao.TransactionDao;
 import com.yourorg.finance.model.Budget;
 import com.yourorg.finance.model.Category;
 import com.yourorg.finance.model.Transaction;
@@ -17,12 +18,17 @@ import javafx.scene.layout.HBox;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BudgetController {
     @FXML private TableView<Budget> table;
     @FXML private TableColumn<Budget, String> catCol;
     @FXML private TableColumn<Budget, Double> limitCol;
     @FXML private Button addBtn, editBtn, delBtn;
+    @FXML private ComboBox<String> monthFilter;
+    @FXML private ComboBox<String> yearFilter;
+
 
     private final BudgetDao dao = new BudgetDao();
     private final int currentUserId = 1; // TODO: replace with real user
@@ -49,6 +55,18 @@ public class BudgetController {
         table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         catCol.prefWidthProperty().bind(table.widthProperty().multiply(0.60));
         limitCol.prefWidthProperty().bind(table.widthProperty().multiply(0.40));
+        // initialize filters:
+        monthFilter.getItems().setAll(
+                "All","Jan","Feb","Mar","Apr","May","Jun",
+                "Jul","Aug","Sep","Oct","Nov","Dec"
+        );
+        yearFilter.getItems().setAll("All","2023","2024","2025");
+        monthFilter.getSelectionModel().select("All");
+        yearFilter.getSelectionModel().select("All");
+
+        // whenever filter changes, reload the table:
+        monthFilter.setOnAction(e -> refreshTable());
+        yearFilter .setOnAction(e -> refreshTable());
 
         refreshTable();
 
@@ -88,12 +106,52 @@ public class BudgetController {
 
     private void refreshTable() {
         try {
-            List<Budget> list = dao.findByUser(currentUserId);
-            data.setAll(list);
+            // get raw budgets (these are static entries)
+            List<Budget> allBudgets = dao.findByUser(currentUserId);
+
+            // but we only *display* budgets that have spending in the selected window
+            // (or alternatively, always display but show zero consumption…)
+            String m = monthFilter.getValue();
+            String y = yearFilter.getValue();
+
+            // fetch all transactions once:
+            List<Transaction> allTx = new TransactionDao().findByUser(currentUserId);
+            Stream<Budget> stream = allBudgets.stream();
+
+            // if month != All, parse to number:
+            if (!"All".equals(m)) {
+                int month = List.of(
+                        "Jan","Feb","Mar","Apr","May","Jun",
+                        "Jul","Aug","Sep","Oct","Nov","Dec"
+                ).indexOf(m) + 1;
+                stream = stream.filter(budget ->
+                        allTx.stream().anyMatch(tx ->
+                                tx.getCategory().equalsIgnoreCase(budget.getCategory())
+                                        && tx.getDate().getMonthValue() == month
+                                        && ( "All".equals(y) || tx.getDate().getYear() == Integer.parseInt(y) )
+                        )
+                );
+            }
+            // if year != All but month==All:
+            else if (!"All".equals(y)) {
+                int year = Integer.parseInt(y);
+                stream = stream.filter(budget ->
+                        allTx.stream().anyMatch(tx ->
+                                tx.getCategory().equalsIgnoreCase(budget.getCategory())
+                                        && tx.getDate().getYear() == year
+                        )
+                );
+            }
+
+            // collect & show
+            List<Budget> filtered = stream.collect(Collectors.toList());
+            data.setAll(filtered);
+
         } catch (SQLException ex) {
             showAlert("DB Error", ex.getMessage());
         }
     }
+
 
     // in BudgetController.showDialog(...)
     @FXML

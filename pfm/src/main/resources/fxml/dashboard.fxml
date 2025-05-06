@@ -11,33 +11,45 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.scene.control.ComboBox?>
 <BorderPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.yourorg.finance.controller.DashboardController">
 
     <!-- Top summary cards -->
+    <!-- Top summary cards + filters -->
     <top>
-        <HBox spacing="20">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
+        <VBox spacing="10">
+            <HBox spacing="20">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
 
-            <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                <top><Label text="Total Balance" style="-fx-font-weight:bold;"/></top>
-                <center><Label fx:id="totalBalanceLabel" style="-fx-font-size:16px;">$0.00</Label></center>
-            </BorderPane>
+                <!-- Cards… -->
+                <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
+                    <top><Label text="Total Balance" style="-fx-font-weight:bold;"/></top>
+                    <center><Label fx:id="totalBalanceLabel" style="-fx-font-size:16px;">$0.00</Label></center>
+                </BorderPane>
+                <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
+                    <top><Label text="Monthly Expenses" style="-fx-font-weight:bold;"/></top>
+                    <center><Label fx:id="monthlyExpensesLabel" style="-fx-font-size:16px;">$0.00</Label></center>
+                </BorderPane>
+                <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
+                    <top><Label text="Budget Consumption" style="-fx-font-weight:bold;"/></top>
+                    <center><Label fx:id="goalsProgressLabel" style="-fx-font-size:16px;">0%</Label></center>
+                </BorderPane>
+            </HBox>
 
-            <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                <top><Label text="Monthly Expenses" style="-fx-font-weight:bold;"/></top>
-                <center><Label fx:id="monthlyExpensesLabel" style="-fx-font-size:16px;">$0.00</Label></center>
-            </BorderPane>
-
-            <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                <top><Label text="Budget Comsumption" style="-fx-font-weight:bold;"/></top>
-                <center><Label fx:id="goalsProgressLabel" style="-fx-font-size:16px;">0%</Label></center>
-            </BorderPane>
-        </HBox>
+            <!-- Month & Year filters -->
+            <HBox spacing="10">
+                <ComboBox fx:id="monthFilter" promptText="Month"/>
+                <ComboBox fx:id="yearFilter"  promptText="Year"/>
+            </HBox>
+        </VBox>
     </top>
+
 
     <!-- Center: charts + per‐budget bars -->
     <center>

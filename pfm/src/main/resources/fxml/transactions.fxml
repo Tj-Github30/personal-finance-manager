@@ -6,26 +6,38 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.yourorg.finance.controller.TransactionsController">
 
-    <!-- Top tool bar with your CRUD buttons -->
+    <!-- Top: Buttons + Filters -->
     <top>
+        <!-- Stack your tool‑bar and your filters with a little vertical gap -->
         <HBox spacing="10">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
+
+            <!-- Add/Edit/Delete -->
             <Button fx:id="addBtn"  text="Add Transaction"/>
             <Button fx:id="editBtn" text="Edit Selected"/>
             <Button fx:id="delBtn"  text="Delete Selected"/>
+
+            <!-- spacer -->
+            <HBox/>
+            <!-- Month & Year filters -->
+            <HBox spacing="10">
+                <ComboBox fx:id="monthFilter" promptText="Month"/>
+                <ComboBox fx:id="yearFilter"  promptText="Year"/>
+            </HBox>
         </HBox>
     </top>
 
-    <!-- Center table view for transactions -->
+    <!-- Center: Table -->
     <center>
-        <TableView fx:id="table"
-                     prefWidth="800">
+        <TableView fx:id="table" prefWidth="800">
             <columns>
                 <TableColumn fx:id="dateCol" text="Date"        prefWidth="100"/>
                 <TableColumn fx:id="descCol" text="Description" prefWidth="300"/>

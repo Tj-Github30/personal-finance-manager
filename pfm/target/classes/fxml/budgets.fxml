@@ -1,26 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
+<?import java.lang.String?>
 <BorderPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.yourorg.finance.controller.BudgetController">
 
+    <!-- Top toolbar + filters -->
     <top>
         <HBox spacing="10">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
+
+            <!-- Add/Edit/Delete -->
             <Button fx:id="addBtn"  text="Add Budget"/>
             <Button fx:id="editBtn" text="Edit Selected"/>
             <Button fx:id="delBtn"  text="Delete Selected"/>
+
+            <!-- spacer -->
+            <HBox/>
+            <!-- Month & Year filters -->
+            <HBox spacing="10">
+                <ComboBox fx:id="monthFilter" promptText="Month"/>
+                <ComboBox fx:id="yearFilter"  promptText="Year"/>
+            </HBox>
         </HBox>
     </top>
 
+    <!-- Center: the budgets table -->
     <center>
         <TableView fx:id="table" prefWidth="800">
             <columns>
