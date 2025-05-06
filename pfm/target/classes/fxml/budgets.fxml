@@ -5,44 +5,48 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 
-<?import java.lang.String?>
 <BorderPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.yourorg.finance.controller.BudgetController">
+            fx:controller="com.yourorg.finance.controller.BudgetController"
+            stylesheets="@../css/styles.css"
+            styleClass="budgets-view">
 
     <!-- Top toolbar + filters -->
     <top>
-        <HBox spacing="10">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
+        <ToolBar styleClass="budgets-toolbar">
+            <items>
+                <!-- Add/Edit/Delete -->
+                <Button fx:id="addBtn"  text="Add Budget"  styleClass="action-btn"/>
+                <Button fx:id="editBtn" text="Edit Selected" styleClass="action-btn"/>
+                <Button fx:id="delBtn"  text="Delete Selected" styleClass="action-btn"/>
 
-            <!-- Add/Edit/Delete -->
-            <Button fx:id="addBtn"  text="Add Budget"/>
-            <Button fx:id="editBtn" text="Edit Selected"/>
-            <Button fx:id="delBtn"  text="Delete Selected"/>
+                <!-- spacer -->
+                <Region HBox.hgrow="ALWAYS"/>
 
-            <!-- spacer -->
-            <HBox/>
-            <!-- Month & Year filters -->
-            <HBox spacing="10">
-                <ComboBox fx:id="monthFilter" promptText="Month"/>
-                <ComboBox fx:id="yearFilter"  promptText="Year"/>
-            </HBox>
-        </HBox>
+                <!-- Month & Year filters -->
+                <HBox spacing="8" styleClass="filter-box">
+                    <ComboBox fx:id="monthFilter" promptText="Month" styleClass="filter-combo"/>
+                    <ComboBox fx:id="yearFilter"  promptText="Year"  styleClass="filter-combo"/>
+                </HBox>
+            </items>
+        </ToolBar>
     </top>
 
     <!-- Center: the budgets table -->
     <center>
-        <TableView fx:id="table" prefWidth="800">
+        <TableView fx:id="table" styleClass="budgets-table" prefWidth="800" padding="10">
             <columns>
-                <TableColumn fx:id="catCol"   text="Category" prefWidth="400"/>
-                <TableColumn fx:id="limitCol" text="Limit"    prefWidth="200"/>
+                <TableColumn fx:id="catCol"   text="Category" styleClass="col-category"/>
+                <TableColumn fx:id="limitCol" text="Limit"    styleClass="col-limit"/>
             </columns>
         </TableView>
+
     </center>
 
 </BorderPane>
+

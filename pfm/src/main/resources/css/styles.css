@@ -1,0 +1,150 @@
+/* ---------- Global ---------- */
+.root {
+  -fx-font-family: "Segoe UI", sans-serif;
+  -fx-font-size: 14px;
+  -fx-background-color: #f0f2f5;
+}
+
+/* ---------- Buttons ---------- */
+.button {
+  -fx-padding: 8 16;
+  -fx-border-radius: 4;
+  -fx-background-radius: 4;
+  -fx-cursor: hand;
+}
+.btn-primary {
+  -fx-background-color: #007bff;
+  -fx-text-fill: white;
+}
+.btn-primary:hover {
+  -fx-background-color: #0056b3;
+}
+.btn-secondary {
+  -fx-background-color: transparent;
+  -fx-border-color: #6c757d;
+  -fx-text-fill: #6c757d;
+}
+.btn-secondary:hover {
+  -fx-background-color: #6c757d;
+  -fx-text-fill: white;
+}
+
+/* ---------- Headers & Titles ---------- */
+.header-label {
+  -fx-font-size: 24px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #333;
+}
+#pageTitle {
+  -fx-font-size: 18px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #222;
+}
+
+/* ---------- Welcome Pane ---------- */
+.welcome-pane {
+  -fx-background-color: linear-gradient(to bottom, #e9ecef, #dee2e6);
+}
+
+/* ---------- Top Bar ---------- */
+.top-bar {
+  -fx-background-color: #ffffff;
+  -fx-padding: 10;
+  -fx-border-color: #dee2e6;
+  -fx-border-width: 0 0 1 0;
+}
+
+/* ---------- Sidebar ---------- */
+.left-pane .button {
+  -fx-background-color: transparent;
+  -fx-text-fill: #333;
+  -fx-alignment: CENTER_LEFT;
+}
+.left-pane .button:hover {
+  -fx-background-color: #e9ecef;
+}/* sidebar background */
+ .sidebar {
+   -fx-background-color: #2F3D4A;
+   -fx-pref-width: 160;            /* adjust to taste */
+ }
+
+ /* buttons in the sidebar */
+ .sidebar-button {
+   -fx-background-color: transparent;
+   -fx-text-fill: white;
+   -fx-font-size: 14px;
+   -fx-alignment: CENTER_LEFT;
+   -fx-graphic-text-gap: 8px;      /* space between icon & text */
+   -fx-padding: 8 12;
+ }
+
+ /* hover / selected effects */
+ .sidebar-button:hover {
+   -fx-background-color: #3E4C5A;
+ }
+ .sidebar-button:focused, .sidebar-button:selected {
+   -fx-background-color: #1F2B35;
+ }
+
+
+/* ---------- Summary Cards ---------- */
+.card {
+  -fx-background-color: white;
+  -fx-border-color: #ced4da;
+  -fx-border-radius: 4;
+  -fx-background-radius: 4;
+  -fx-padding: 12;
+  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4,0,0,2);
+}
+.card > .label {
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+}
+
+/* ---------- Tables ---------- */
+.table-view {
+  -fx-background-color: white;
+  -fx-border-color: transparent;
+  -fx-table-cell-border-color: #e9ecef;
+  -fx-padding: 0 0 10 0;
+}
+.table-view .column-header-background {
+  -fx-background-color: #f8f9fa;
+}
+.table-row-cell:odd {
+  -fx-background-color: white;
+}
+.table-row-cell:even {
+  -fx-background-color: #f8f9fa;
+}
+.table-cell {
+  -fx-padding: 6 8;
+}
+
+/* Strip stray empty columns */
+.table-view .column-header, .table-view .column-header .label {
+  -fx-alignment: CENTER_LEFT;
+}
+
+/* ---------- Forms ---------- */
+.text-field, .password-field, .combo-box {
+  -fx-background-color: white;
+  -fx-border-color: #ced4da;
+  -fx-border-radius: 4;
+  -fx-background-radius: 4;
+  -fx-padding: 6 8;
+}
+
+/* ---------- Progress Bars ---------- */
+.progress-bar {
+  -fx-accent: #28a745; /* green */
+}
+
+/* ---------- Charts ---------- */
+/* make the PieChart’s own background transparent */
+
+
+/* ---------- Reports BarChart ---------- */
+.bar-chart .chart-bar {
+  -fx-bar-fill: #17a2b8;
+}

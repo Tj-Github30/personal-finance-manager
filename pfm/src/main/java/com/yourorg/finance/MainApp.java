@@ -19,19 +19,29 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        // load your initial FXML exactly as you have it
+        // 1) Load your initial FXML
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/welcome.fxml"));
         Parent root = loader.load();
+
+        // Give the controller the stage if it needs it
         WelcomeController wc = loader.getController();
         wc.setPrimaryStage(stage);
 
-        // get the primary screen’s visual bounds
+        // 2) Compute 60% of the primary screen’s usable area
         Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
         double width  = bounds.getWidth()  * 0.6;
         double height = bounds.getHeight() * 0.6;
 
+        // 3) Create the scene at that size, attach your stylesheet
+        Scene scene = new Scene(root, width, height);
+        scene.getStylesheets().add(
+                getClass().getResource("/css/styles.css")
+                        .toExternalForm()
+        );
+
+        // 4) Show it
         stage.setTitle("PFM Welcome");
-        stage.setScene(new Scene(root, width, height));
+        stage.setScene(scene);
         stage.show();
     }
 

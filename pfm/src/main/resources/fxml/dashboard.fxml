@@ -1,83 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Button?>
-<BorderPane xmlns="http://javafx.com/javafx/20"
+<BorderPane fx:id="rootPane"
+            xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.yourorg.finance.controller.DashboardController">
+            fx:controller="com.yourorg.finance.controller.DashboardController"
+            styleClass="dashboard-root"
+            stylesheets="@../css/styles.css">
 
-    <!-- Top summary cards -->
-    <!-- Top summary cards + filters -->
+    <!-- Top: cards + filters -->
     <top>
-        <VBox spacing="10">
-            <HBox spacing="20">
-                <padding>
-                    <Insets top="10" right="10" bottom="10" left="10"/>
-                </padding>
-
-                <!-- Cards… -->
-                <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                    <top><Label text="Total Balance" style="-fx-font-weight:bold;"/></top>
+        <VBox spacing="10" styleClass="dashboard-top-box">
+            <HBox spacing="20" styleClass="dashboard-cards">
+                <BorderPane styleClass="card">
+                    <top>
+                        <Label text="Total Balance" styleClass="card-title"/>
+                    </top>
                     <center><Label fx:id="totalBalanceLabel" style="-fx-font-size:16px;">$0.00</Label></center>
+
                 </BorderPane>
-                <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                    <top><Label text="Monthly Expenses" style="-fx-font-weight:bold;"/></top>
-                    <center><Label fx:id="monthlyExpensesLabel" style="-fx-font-size:16px;">$0.00</Label></center>
+                <BorderPane styleClass="card">
+                    <top>
+                        <Label text="Monthly Expenses" styleClass="card-title"/>
+                    </top>
+                    <center>
+                        <Label fx:id="monthlyExpensesLabel" style="-fx-font-size:16px;">$0.00</Label>
+                    </center>
                 </BorderPane>
-                <BorderPane style="-fx-border-color: gray; -fx-border-width: 1; -fx-padding: 10;">
-                    <top><Label text="Budget Consumption" style="-fx-font-weight:bold;"/></top>
-                    <center><Label fx:id="goalsProgressLabel" style="-fx-font-size:16px;">0%</Label></center>
+                <BorderPane styleClass="card">
+                    <top>
+                        <Label text="Budget Consumption" styleClass="card-title"/>
+                    </top>
+                    <center>
+                        <Label fx:id="goalsProgressLabel" text="0%" styleClass="card-value"/>
+                    </center>
                 </BorderPane>
             </HBox>
 
-            <!-- Month & Year filters -->
-            <HBox spacing="10">
-                <ComboBox fx:id="monthFilter" promptText="Month"/>
-                <ComboBox fx:id="yearFilter"  promptText="Year"/>
-                <Button fx:id="exportCsvBtn" text="Export CSV"/>
+            <HBox spacing="10" styleClass="dashboard-filters">
+                <Region HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="monthFilter"
+                          promptText="Month"
+                          styleClass="filter-combo">
+                </ComboBox>
+                <ComboBox fx:id="yearFilter"
+                          promptText="Year"
+                          styleClass="filter-combo">
+                </ComboBox>
+                <Button fx:id="exportCsvBtn"
+                        text="Export CSV"
+                        styleClass="btn-primary"/>
             </HBox>
-
         </VBox>
     </top>
 
-
-    <!-- Center: charts + per‐budget bars -->
+    <!-- Center: charts + per‐budget progress bars -->
     <center>
-        <VBox spacing="20">
-            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+        <VBox spacing="20" styleClass="dashboard-center">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
 
-            <SplitPane orientation="HORIZONTAL">
+            <SplitPane orientation="HORIZONTAL" styleClass="charts-split">
                 <PieChart fx:id="pieChart" prefWidth="400" prefHeight="300"/>
-                <LineChart fx:id="lineChart" prefWidth="600" prefHeight="300">
-                    <xAxis><NumberAxis label="Day"/></xAxis>
-                    <yAxis><NumberAxis label="Amount"/></yAxis>
+                <LineChart fx:id="lineChart"
+                           prefWidth="600" prefHeight="300"
+                           styleClass="chart-line">
+                    <xAxis>
+                        <NumberAxis label="Day"/>
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis label="Amount"/>
+                    </yAxis>
                 </LineChart>
             </SplitPane>
 
-            <VBox fx:id="budgetsBox" spacing="8">
-                <!-- progress bars injected here -->
-            </VBox>
+            <VBox fx:id="budgetsBox"
+                  spacing="8"
+                  styleClass="budget-bars"/>
         </VBox>
     </center>
 
     <!-- Bottom: recent transactions -->
     <bottom>
-        <VBox spacing="5">
-            <Label text="Recent Transactions" style="-fx-font-size:14px;"/>
-            <TableView fx:id="recentTable" prefHeight="180">
+        <VBox spacing="5" styleClass="dashboard-recent">
+            <padding>
+                <Insets top="0" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label text="Recent Transactions" styleClass="section-title"/>
+            <TableView fx:id="recentTable"
+                       prefHeight="180"
+                       styleClass="table-recent">
                 <columns>
                     <TableColumn fx:id="dtCol"   text="Date"        prefWidth="100"/>
                     <TableColumn fx:id="descCol" text="Description" prefWidth="300"/>
@@ -87,5 +114,4 @@
             </TableView>
         </VBox>
     </bottom>
-
 </BorderPane>
