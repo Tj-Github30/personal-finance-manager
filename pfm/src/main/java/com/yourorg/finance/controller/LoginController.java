@@ -10,50 +10,66 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.Node;
 import javafx.stage.Stage;
 
-public class LoginController {
+public class LoginController extends BaseAuthController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
 
-    // Use the AuthService we built
-    private final AuthService authService = new AuthService();
+    @FXML
+    private void handleLoginAction() {
+        try {
+            User u = auth.login(usernameField.getText().trim(),
+                    passwordField.getText());
+            if (u == null) {
+                showAlert("Login Failed","Invalid credentials.");
+                return;
+            }
 
-@FXML
-private void handleLoginAction(ActionEvent event) {
-    System.out.println("🔑 Login button clicked — username="
-            + usernameField.getText() + " password=" + passwordField.getText());
-    String user = usernameField.getText().trim();
-    String pass = passwordField.getText();
-
-    try {
-        User authenticated = authService.login(user, pass);
-        if (authenticated != null) {
-            // Load main.fxml
+            // 1) Load the main layout
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/fxml/main.fxml")
             );
             Parent mainRoot = loader.load();
 
-            // Optional: pass the logged-in user to MainController
-            // MainController mainCtrl = loader.getController();
-            // mainCtrl.setCurrentUser(authenticated);
+            // 2) Wire up controller
+            MainController mc = loader.getController();
+            mc.setCurrentUser(u);
 
-            // Replace the current window's scene
-            Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-            stage.setTitle("PFM Dashboard");
-            stage.setScene(new Scene(mainRoot, 1200, 800));
-            stage.show();
-        } else {
-            // login failed → show error alert
-            Alert err = new Alert(Alert.AlertType.ERROR, "Invalid username or password.");
-            err.setHeaderText(null);
-            err.showAndWait();
+            // 3) Swap scenes
+            Stage st = (Stage) usernameField.getScene().getWindow();
+            st.setScene(new Scene(mainRoot, st.getWidth(), st.getHeight()));
+            st.setTitle("PFM Dashboard");
+
+            // 4) *Immediately* show the Dashboard tab
+            mc.onDashboard();
+
+        } catch (Exception ex) {
+            showAlert("Error",ex.getMessage());
         }
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
 
+
+    @FXML
+    private void handleShowRegister() throws Exception {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/register.fxml")
+        );
+        Parent regRoot = loader.load();
+        // If your RegisterController needs the authService, inject it here:
+        RegisterController rc = loader.getController();
+        rc.setAuthService(AuthService.getInstance());   // or however you supply it
+
+        // swap the root
+        Stage stage = (Stage) usernameField.getScene().getWindow();
+        stage.getScene().setRoot(regRoot);
+        stage.setTitle("PFM Register");
+    }
+
+
+    private void showAlert(String t, String m) {
+        Alert a = new Alert(Alert.AlertType.WARNING, m);
+        a.setHeaderText(t);
+        a.showAndWait();
+    }
 }

@@ -75,7 +75,6 @@ public class ConnectionManager {
 
 
             // Reminders table
-//            stmt.execute("DROP TABLE reminders");
             stmt.execute("CREATE TABLE IF NOT EXISTS reminders (\n" +
                     "              id                   INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                     "              user_id              INTEGER NOT NULL,\n" +

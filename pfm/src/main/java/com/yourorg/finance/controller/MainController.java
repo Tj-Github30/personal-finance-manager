@@ -1,5 +1,7 @@
 package com.yourorg.finance.controller;
 
+import com.yourorg.finance.model.User;
+import com.yourorg.finance.service.AuthService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,12 +15,22 @@ import java.io.IOException;
 public class MainController {
     @FXML private StackPane contentPane;
     @FXML private Label pageTitle;
+    private User currentUser;
 
     @FXML public void initialize() {
-        onDashboard();
+//        Parent welcome = FXMLLoader.load(getClass().getResource("/fxml/welcome.fxml"));
+//        contentPane.getChildren().setAll(welcome);
+        loadView("/fxml/welcome.fxml", "Welcome");
     }
 
-    @FXML private void onDashboard() {
+    public void setCurrentUser(User u) {
+        this.currentUser = u;
+        // optionally update your pageTitle with their name:
+        pageTitle.setText("Dashboard — " + u.getUsername());
+    }
+
+    @FXML
+    void onDashboard() {
         loadView("/fxml/dashboard.fxml", "Dashboard");
     }
 
@@ -40,6 +52,7 @@ public class MainController {
 
     @FXML private void onLogout() {
         try {
+            AuthService.getInstance().logout();
             Parent loginRoot = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
             Stage stage = (Stage) contentPane.getScene().getWindow();
             stage.getScene().setRoot(loginRoot);

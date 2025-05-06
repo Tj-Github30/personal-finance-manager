@@ -5,6 +5,8 @@ import com.yourorg.finance.dao.TransactionDao;
 import com.yourorg.finance.model.Budget;
 import com.yourorg.finance.model.Report;
 import com.yourorg.finance.model.Transaction;
+import com.yourorg.finance.model.User;
+import com.yourorg.finance.service.AuthService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -41,7 +43,11 @@ public class ReportsController {
 
     private final TransactionDao txDao   = new TransactionDao();
     private final BudgetDao      budgetDao = new BudgetDao();
-    private final int userId = 1; // TODO: wire real user
+    private int currentUserId() {
+        User u = AuthService.getInstance().getCurrentUser();
+        return u != null ? u.getId() : -1;
+    }
+    // TODO: wire real user
 
     @FXML
     public void initialize() {
@@ -80,7 +86,7 @@ public class ReportsController {
     private void onGenerate() {
         try {
             // 1) filter transactions by selected month/year
-            List<Transaction> allTx = txDao.findByUser(userId);
+            List<Transaction> allTx = txDao.findByUser(currentUserId());
             YearMonth filterYm = parseYearMonth(monthFilter.getValue(), yearFilter.getValue());
 
             List<Transaction> txs = allTx.stream()
@@ -92,7 +98,7 @@ public class ReportsController {
                     .collect(Collectors.toList());
 
             // 2) load budgets
-            List<Budget> budgets = budgetDao.findByUser(userId);
+            List<Budget> budgets = budgetDao.findByUser(currentUserId());
 
             // 3) group spending by category
             Map<String,Double> spentByCat = txs.stream()

@@ -4,6 +4,8 @@ import com.yourorg.finance.dao.BudgetDao;
 import com.yourorg.finance.dao.TransactionDao;
 import com.yourorg.finance.model.Budget;
 import com.yourorg.finance.model.Transaction;
+import com.yourorg.finance.model.User;
+import com.yourorg.finance.service.AuthService;
 import com.yourorg.finance.util.EventBus;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -51,7 +53,11 @@ public class DashboardController {
     @FXML private TableView<Transaction> table;
 
     private final TransactionDao txDao = new TransactionDao();
-    private final int currentUserId = 1;
+    private int currentUserId() {
+        User u = AuthService.getInstance().getCurrentUser();
+        return u != null ? u.getId() : -1;
+    }
+
 
     @FXML
     public void initialize() {
@@ -116,7 +122,7 @@ public class DashboardController {
     private void refreshDashboard() {
         try {
             // fetch all
-            List<Transaction> all = txDao.findByUser(currentUserId);
+            List<Transaction> all = txDao.findByUser(currentUserId());
 
             // apply month/year filter
             String m = monthFilter.getValue();
@@ -182,7 +188,7 @@ public class DashboardController {
             recentTable.setItems(FXCollections.observableArrayList(recent));
 
             // ─ E) Goals % ─────────────────────────────
-            List<Budget> budgets = new BudgetDao().findByUser(currentUserId);
+            List<Budget> budgets = new BudgetDao().findByUser(currentUserId());
             double totalBudget = budgets.stream()
                     .mapToDouble(Budget::getLimit).sum();
             double spent        = filtered.stream()
@@ -221,7 +227,7 @@ public class DashboardController {
         // 1) Fetch whichever set of transactions you want:
         List<Transaction> rows;
         try {
-            rows = txDao.findByUser(currentUserId);
+            rows = txDao.findByUser(currentUserId());
         } catch (SQLException ex) {
             new Alert(Alert.AlertType.ERROR, "DB error: " + ex.getMessage())
                     .showAndWait();

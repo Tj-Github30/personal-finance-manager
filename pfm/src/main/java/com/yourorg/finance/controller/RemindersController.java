@@ -2,6 +2,8 @@ package com.yourorg.finance.controller;
 
 import com.yourorg.finance.dao.ReminderDao;
 import com.yourorg.finance.model.Reminder;
+import com.yourorg.finance.model.User;
+import com.yourorg.finance.service.AuthService;
 import com.yourorg.finance.service.ReminderService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,7 +32,11 @@ public class RemindersController {
     private final ReminderDao dao = new ReminderDao();
     private final ReminderService service = new ReminderService();
     private final ObservableList<Reminder> data = FXCollections.observableArrayList();
-    private final int currentUserId = 1;
+    private int currentUserId() {
+        User u = AuthService.getInstance().getCurrentUser();
+        return u != null ? u.getId() : -1;
+    }
+
 
     @FXML
     public void initialize() throws SQLException {
@@ -55,7 +61,7 @@ public class RemindersController {
         intervalBox = new ComboBox<>();
         intervalBox.getItems().setAll("NONE","HOURLY","DAILY","MONTHLY","YEARLY");
 
-        service.start(currentUserId);
+        service.start(currentUserId());
 
         // 4) wiring
         addBtn.setOnAction(e -> showDialog(null));
@@ -79,7 +85,7 @@ public class RemindersController {
 
     private void loadAll() {
         try {
-            List<Reminder> list = dao.findByUser(currentUserId);
+            List<Reminder> list = dao.findByUser(currentUserId());
             data.setAll(list);
         } catch(SQLException ex) {
             ex.printStackTrace();
@@ -147,7 +153,7 @@ public class RemindersController {
 
                 return new Reminder(
                         isNew ? 0 : r.getId(),
-                        currentUserId,
+                        currentUserId(),
                         msgField.getText().trim(),
                         at,
                         recurring,

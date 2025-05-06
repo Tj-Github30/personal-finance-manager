@@ -1,29 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import javafx.geometry.HPos?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<GridPane fx:id="loginPane" alignment="CENTER" hgap="10" vgap="10"
-          xmlns="http://javafx.com/javafx/20"
-          xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="com.yourorg.finance.controller.LoginController">
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
+<VBox xmlns="http://javafx.com/javafx/20"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.yourorg.finance.controller.LoginController"
+      alignment="CENTER"
+      spacing="20"
+      prefWidth="600" prefHeight="350">
 
-    <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-    <TextField fx:id="usernameField"
-               promptText="Enter username"
-               GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <!-- Title -->
+    <Label text="Please Log In"
+           style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-    <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-    <PasswordField fx:id="passwordField"
-                   promptText="Enter password"
-                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <!-- Centered form -->
+    <GridPane alignment="CENTER" hgap="10" vgap="10">
+        <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
 
-    <Button text="Login"
-            onAction="#handleLoginAction"
-            GridPane.rowIndex="2" GridPane.columnIndex="1"
-            GridPane.halignment="RIGHT"/>
-</GridPane>
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT" hgrow="NEVER"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <!-- row 0 -->
+        <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="usernameField" promptText="Username"
+                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <!-- row 1 -->
+        <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <PasswordField fx:id="passwordField" promptText="Password"
+                       GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <!-- Buttons -->
+    <HBox alignment="CENTER" spacing="10">
+        <Button text="Log In" onAction="#handleLoginAction"/>
+        <Button text="Register" onAction="#handleShowRegister"/>
+    </HBox>
+</VBox>

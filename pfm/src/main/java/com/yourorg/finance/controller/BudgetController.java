@@ -6,6 +6,8 @@ import com.yourorg.finance.dao.TransactionDao;
 import com.yourorg.finance.model.Budget;
 import com.yourorg.finance.model.Category;
 import com.yourorg.finance.model.Transaction;
+import com.yourorg.finance.model.User;
+import com.yourorg.finance.service.AuthService;
 import com.yourorg.finance.util.EventBus;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,7 +33,11 @@ public class BudgetController {
 
 
     private final BudgetDao dao = new BudgetDao();
-    private final int currentUserId = 1; // TODO: replace with real user
+    private int currentUserId() {
+        User u = AuthService.getInstance().getCurrentUser();
+        return u != null ? u.getId() : -1;
+    }
+    // TODO: replace with real user
 //    private final ObservableList<Budget> data = FXCollections.observableArrayList();
     private final ObservableList<Budget> data =
             FXCollections.observableArrayList();
@@ -107,7 +113,7 @@ public class BudgetController {
     private void refreshTable() {
         try {
             // get raw budgets (these are static entries)
-            List<Budget> allBudgets = dao.findByUser(currentUserId);
+            List<Budget> allBudgets = dao.findByUser(currentUserId());
 
             // but we only *display* budgets that have spending in the selected window
             // (or alternatively, always display but show zero consumption…)
@@ -115,7 +121,7 @@ public class BudgetController {
             String y = yearFilter.getValue();
 
             // fetch all transactions once:
-            List<Transaction> allTx = new TransactionDao().findByUser(currentUserId);
+            List<Transaction> allTx = new TransactionDao().findByUser(currentUserId());
             Stream<Budget> stream = allBudgets.stream();
 
             // if month != All, parse to number:
@@ -166,7 +172,7 @@ public class BudgetController {
         // --- 2) Load existing categories from CategoryDao ---
         List<Category> cats;
         try {
-            cats = new CategoryDao().findAll(currentUserId);
+            cats = new CategoryDao().findAll(currentUserId());
         } catch (SQLException ex) {
             cats = List.of();  // fallback to empty
         }
@@ -193,7 +199,7 @@ public class BudgetController {
             input.setContentText("Name:");
             input.showAndWait().ifPresent(name -> {
                 try {
-                    Category created = new CategoryDao().create(currentUserId, name.trim());
+                    Category created = new CategoryDao().create(currentUserId(), name.trim());
                     catList.add(created);
                     catBox.getSelectionModel().select(created);
                 } catch (SQLException e) {
@@ -228,7 +234,7 @@ public class BudgetController {
                     String categoryName = catBox.getValue().getName();
                     return new Budget(
                             isNew ? 0 : b.getId(),
-                            currentUserId,
+                            currentUserId(),
                             categoryName,
                             lim
                     );

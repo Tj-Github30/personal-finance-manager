@@ -4,6 +4,8 @@ import com.yourorg.finance.dao.CategoryDao;
 import com.yourorg.finance.dao.TransactionDao;
 import com.yourorg.finance.model.Category;
 import com.yourorg.finance.model.Transaction;
+import com.yourorg.finance.model.User;
+import com.yourorg.finance.service.AuthService;
 import com.yourorg.finance.util.EventBus;          // <— import EventBus
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,7 +39,11 @@ public class TransactionsController {
 
     private final TransactionDao dao    = new TransactionDao();
     private final CategoryDao   catDao = new CategoryDao();
-    private final int currentUserId     = 1; // TODO: wire this up properly
+    private int currentUserId() {
+        User u = AuthService.getInstance().getCurrentUser();
+        return u != null ? u.getId() : -1;
+    }
+    // TODO: wire this up properly
 
     /** The single backing list for the TableView */
     private final ObservableList<Transaction> data =
@@ -120,7 +126,7 @@ public class TransactionsController {
     public void refreshTable() {
         try {
             // 1) Load everything
-            List<Transaction> allTx = dao.findByUser(currentUserId);
+            List<Transaction> allTx = dao.findByUser(currentUserId());
 
             // 2) Read selections
             String m = monthFilter.getValue();
@@ -173,7 +179,7 @@ public class TransactionsController {
         // --- 3) Load categories ---
         List<Category> cats;
         try {
-            cats = catDao.findAll(currentUserId);
+            cats = catDao.findAll(currentUserId());
         } catch (SQLException e) {
             e.printStackTrace();
             cats = List.of();
@@ -198,7 +204,7 @@ public class TransactionsController {
             input.setContentText("Name:");
             input.showAndWait().ifPresent(name -> {
                 try {
-                    Category created = catDao.create(currentUserId, name.trim());
+                    Category created = catDao.create(currentUserId(), name.trim());
                     catList.add(created);
                     catBox.setItems(catList);
                     catBox.setValue(created);
@@ -237,7 +243,7 @@ public class TransactionsController {
                     double amt = Double.parseDouble(amtField.getText().trim());
                     return new Transaction(
                             isNew ? 0 : tx.getId(),
-                            currentUserId,
+                            currentUserId(),
                             datePicker.getValue(),
                             descField.getText().trim(),
                             catBox.getValue().getName(),
@@ -302,7 +308,7 @@ public class TransactionsController {
         // 1) Fetch whichever set of transactions you want:
         List<Transaction> rows;
         try {
-            rows = dao.findByUser(currentUserId);
+            rows = dao.findByUser(currentUserId());
         } catch (SQLException ex) {
             new Alert(Alert.AlertType.ERROR, "DB error: " + ex.getMessage())
                     .showAndWait();
