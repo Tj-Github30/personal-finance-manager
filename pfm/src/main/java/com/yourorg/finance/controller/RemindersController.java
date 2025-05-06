@@ -34,13 +34,21 @@ public class RemindersController {
 
     @FXML
     public void initialize() throws SQLException {
-        // 1) column binding
-        msgCol      .setCellValueFactory(new PropertyValueFactory<>("message"));
-        timeCol     .setCellValueFactory(new PropertyValueFactory<>("triggerAt"));
-        recCol      .setCellValueFactory(new PropertyValueFactory<>("recurring"));
-        intervalCol .setCellValueFactory(new PropertyValueFactory<>("repeatIntervalMs"));
+        // 1) Column wiring
+        msgCol     .setCellValueFactory(new PropertyValueFactory<>("message"));
+        timeCol    .setCellValueFactory(new PropertyValueFactory<>("triggerAt"));
+        recCol     .setCellValueFactory(new PropertyValueFactory<>("recurring"));
+        intervalCol.setCellValueFactory(new PropertyValueFactory<>("repeatIntervalMs"));
 
-        // 2) populate & schedule
+        // 2) Strip stray blank columns & set proportional resize
+        table.getColumns().removeIf(c -> c.getText()==null || c.getText().isBlank());
+        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        msgCol     .prefWidthProperty().bind(table.widthProperty().multiply(0.40)); // 40%
+        timeCol    .prefWidthProperty().bind(table.widthProperty().multiply(0.25)); // 25%
+        recCol     .prefWidthProperty().bind(table.widthProperty().multiply(0.15)); // 15%
+        intervalCol.prefWidthProperty().bind(table.widthProperty().multiply(0.20)); // 20%
+
+        // 3) Populate & schedule
         table.setItems(data);
         loadAll();
         // prepare the ComboBox for the dialog
@@ -49,7 +57,7 @@ public class RemindersController {
 
         service.start(currentUserId);
 
-        // 3) wiring
+        // 4) wiring
         addBtn.setOnAction(e -> showDialog(null));
         editBtn.setOnAction(e -> {
             Reminder sel = table.getSelectionModel().getSelectedItem();

@@ -81,7 +81,15 @@ public class DashboardController {
             }
         });
 
-        // 2) filters
+        // ─── 2) Strip blank columns & proportional resize ──────────────────
+        recentTable.getColumns().removeIf(c -> c.getText()==null || c.getText().isBlank());
+        recentTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        dtCol .prefWidthProperty().bind(recentTable.widthProperty().multiply(0.10));
+        descCol.prefWidthProperty().bind(recentTable.widthProperty().multiply(0.40));
+        catCol .prefWidthProperty().bind(recentTable.widthProperty().multiply(0.25));
+        amtCol .prefWidthProperty().bind(recentTable.widthProperty().multiply(0.25));
+
+        // 3) filters
         monthFilter.getItems().setAll(
                 "All","Jan","Feb","Mar","Apr","May","Jun",
                 "Jul","Aug","Sep","Oct","Nov","Dec"
@@ -92,7 +100,7 @@ public class DashboardController {
         monthFilter.setOnAction(e -> refreshDashboard());
         yearFilter .setOnAction(e -> refreshDashboard());
 
-        // 3) listen for changes
+        // 4) listen for changes
         EventBus.get().subscribe(topic -> {
             if (topic.equals("transactions:changed") ||
                     topic.equals("budgets:changed")) {
@@ -100,7 +108,7 @@ public class DashboardController {
             }
         });
 
-        // 4) first load
+        // 5) first load
         refreshDashboard();
         exportCsvBtn.setOnAction(e -> exportCsv());
     }
