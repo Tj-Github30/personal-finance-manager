@@ -31,6 +31,7 @@
             <HBox spacing="10">
                 <ComboBox fx:id="monthFilter" promptText="Month"/>
                 <ComboBox fx:id="yearFilter"  promptText="Year"/>
+                <Button fx:id="exportCsvBtn" text="Export CSV"/>
             </HBox>
         </HBox>
     </top>

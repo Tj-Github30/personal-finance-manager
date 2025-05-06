@@ -12,7 +12,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +33,7 @@ public class TransactionsController {
     @FXML private Button addBtn, editBtn, delBtn;
     @FXML private ComboBox<String> monthFilter;
     @FXML private ComboBox<String> yearFilter;
+    @FXML private Button exportCsvBtn;
 
     private final TransactionDao dao    = new TransactionDao();
     private final CategoryDao   catDao = new CategoryDao();
@@ -108,6 +113,7 @@ public class TransactionsController {
             if (sel!=null) handleDelete(sel);
             else showAlert("No selection","Please select a transaction to delete.");
         });
+        exportCsvBtn.setOnAction(e -> exportCsv());
     }
 
     /** Reloads all transactions for the current user, applying month/year filters */
@@ -290,5 +296,58 @@ public class TransactionsController {
         a.setHeaderText(null);
         a.setTitle(title);
         a.showAndWait();
+    }
+
+    private void exportCsv() {
+        // 1) Fetch whichever set of transactions you want:
+        List<Transaction> rows;
+        try {
+            rows = dao.findByUser(currentUserId);
+        } catch (SQLException ex) {
+            new Alert(Alert.AlertType.ERROR, "DB error: " + ex.getMessage())
+                    .showAndWait();
+            return;
+        }
+        if (rows.isEmpty()) {
+            new Alert(Alert.AlertType.INFORMATION, "No transactions to export")
+                    .showAndWait();
+            return;
+        }
+        // 2) build filename from filters
+        String month = monthFilter.getValue();
+        String year  = yearFilter.getValue();
+        if (month == null || month.equals("All"))  month = "";
+        if (year  == null || year .equals("All"))  year  = "";
+        String namePart = Stream.of(month, year)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.joining(" "));
+        if (namePart.isBlank()) namePart = "All Transactions";
+        String filename = "Transactions - " + namePart + ".csv";
+
+        // 3) Ask user where to save
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save Transactions CSV");
+        chooser.getExtensionFilters()
+                .add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        chooser.setInitialFileName(filename);
+        File file = chooser.showSaveDialog(exportCsvBtn.getScene().getWindow());
+        if (file == null) return;
+
+        // 4) Write out
+        try (PrintWriter out = new PrintWriter(file)) {
+            out.println("Date,Description,Category,Amount");
+            for (Transaction t : rows) {
+                String desc = t.getDescription().replace("\"", "\"\"");
+                out.printf("%s,\"%s\",%s,%.2f%n",
+                        t.getDate(), desc, t.getCategory(), t.getAmount());
+            }
+            new Alert(Alert.AlertType.INFORMATION,
+                    "Exported " + rows.size() + " transactions to:\n" + file)
+                    .showAndWait();
+        } catch (IOException io) {
+            new Alert(Alert.AlertType.ERROR,
+                    "Failed to write CSV:\n" + io.getMessage())
+                    .showAndWait();
+        }
     }
 }
