@@ -75,16 +75,20 @@ public class ConnectionManager {
 
 
             // Reminders table
-            stmt.execute("""
-                    CREATE TABLE IF NOT EXISTS reminders (
-                      id INTEGER PRIMARY KEY AUTOINCREMENT,
-                      user_id INTEGER NOT NULL,
-                      reminder_time TEXT NOT NULL,
-                      message TEXT NOT NULL,
-                      FOREIGN KEY(user_id) REFERENCES users(id)
-                    );
-                    """);
+//            stmt.execute("DROP TABLE reminders");
+            stmt.execute("CREATE TABLE IF NOT EXISTS reminders (\n" +
+                    "              id                   INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
+                    "              user_id              INTEGER NOT NULL,\n" +
+                    "              message              TEXT    NOT NULL,\n" +
+                    "              trigger_at           TEXT    NOT NULL,\n" +
+                    "              recurring            INTEGER NOT NULL,\n" +
+                    "              interval             TEXT    NOT NULL,\n" +
+                    "              repeat_interval_ms   INTEGER NOT NULL,\n" +
+                    "              FOREIGN KEY(user_id) REFERENCES users(id)\n" +
+                    "            );");
+
         }
+
     }
 
     /**

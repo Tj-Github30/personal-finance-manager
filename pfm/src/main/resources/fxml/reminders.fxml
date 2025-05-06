@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/20"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.yourorg.finance.controller.RemindersController">
+
+    <top>
+        <HBox spacing="10">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+            <Button fx:id="addBtn"  text="Add Reminder"/>
+            <Button fx:id="editBtn" text="Edit Selected"/>
+            <Button fx:id="delBtn"  text="Delete Selected"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TableView fx:id="table">
+            <columns>
+                <TableColumn fx:id="msgCol"      text="Message"   prefWidth="300"/>
+                <TableColumn fx:id="timeCol"     text="When"      prefWidth="150"/>
+                <TableColumn fx:id="recCol"      text="Recurring" prefWidth="100"/>
+                <TableColumn fx:id="intervalCol" text="Interval"  prefWidth="100"/>
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

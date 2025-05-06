@@ -69,7 +69,17 @@ public class MainController {
 
     @FXML
     private void onReminders() {
-        contentPane.getChildren().setAll(new Label("Reminders View"));
+        try {
+            // explicitly load as a Parent (which is a Node)
+            Parent dash = FXMLLoader.load(
+                    getClass().getResource("/fxml/reminders.fxml")
+            );
+
+            // now you can pass it directly to setAll(...)
+            contentPane.getChildren().setAll(dash);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
