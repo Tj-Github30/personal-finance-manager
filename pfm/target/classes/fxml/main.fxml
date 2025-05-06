@@ -15,12 +15,11 @@
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
-            <Button text="Dashboard" onAction="#onDashboard" />
-            <Button text="Transactions" onAction="#onTransactions"/>
-            <Button text="Budgets"      onAction="#onBudgets"/>
-            <Button text="Reports"      onAction="#onReports"/>
-            <Button text="Reminders"    onAction="#onReminders"/>
-            <Button text="Settings"     onAction="#onSettings"/>
+            <Button text="Dashboard"    onAction="#onDashboard"    />
+            <Button text="Transactions" onAction="#onTransactions" />
+            <Button text="Budgets"      onAction="#onBudgets"      />
+            <Button text="Reports"      onAction="#onReports"      />
+            <Button text="Reminders"    onAction="#onReminders"    />
         </VBox>
     </left>
 
