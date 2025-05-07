@@ -107,7 +107,27 @@
   -fx-border-color: transparent;
   -fx-table-cell-border-color: #e9ecef;
   -fx-padding: 0 0 10 0;
+  /* the bar behind selected rows */
+    -fx-selection-bar:        #99cfff;
+    /* the text color when a row is selected */
+    -fx-selection-bar-text:   black;
+    /* the bar for focused rows (if different) */
+    -fx-selection-bar-non-focused: #c0dfff;
+
 }
+/* make sure header/odd-even styles don’t override the selected look */
+.table-row-cell:focused:selected,
+.table-row-cell:selected {
+  -fx-background-color: -fx-selection-bar;
+}
+
+/* cells inside that selected row should inherit the same */
+.table-row-cell:selected .table-cell {
+  -fx-background-color: transparent; /* let the row’s color show through */
+  -fx-text-fill: -fx-selection-bar-text;
+}
+
+
 .table-view .column-header-background {
   -fx-background-color: #f8f9fa;
 }
@@ -147,4 +167,8 @@
 /* ---------- Reports BarChart ---------- */
 .bar-chart .chart-bar {
   -fx-bar-fill: #17a2b8;
+}
+
+.budgets-table {
+  -fx-padding: 10;      /* shorthand; you can also do top right bottom left */
 }
