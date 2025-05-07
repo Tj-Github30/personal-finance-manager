@@ -34,10 +34,6 @@
                     styleClass="btn-primary"/>
             <!-- push anything that follows to the right -->
             <Region HBox.hgrow="ALWAYS"/>
-            <!-- optional exports -->
-            <Button fx:id="exportCsvBtn"
-                    text="Export CSV"
-                    styleClass="btn-secondary"/>
         </HBox>
     </top>
 
