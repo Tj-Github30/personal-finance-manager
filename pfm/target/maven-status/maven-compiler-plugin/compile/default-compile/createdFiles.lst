@@ -1,7 +1,0 @@
-com/yourorg/finance/controller/MainController.class
-com/yourorg/finance/service/AuthService.class
-com/yourorg/finance/dao/UserDao.class
-com/yourorg/finance/model/User.class
-com/yourorg/finance/controller/LoginController.class
-com/yourorg/finance/MainApp.class
-com/yourorg/finance/util/ConnectionManager.class
