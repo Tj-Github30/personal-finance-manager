@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.scene.control.SelectionMode;
 
 public class BudgetController {
     @FXML private TableView<Budget> table;
@@ -44,6 +45,10 @@ public class BudgetController {
 
     @FXML
     public void initialize() {
+        // 0) Row selection, not cell selection:
+        table.getSelectionModel().setCellSelectionEnabled(false);
+        table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
         // 1) Column wiring: category ⇢ category, limit_amount ⇢ limit
         catCol  .setCellValueFactory(new PropertyValueFactory<>("category"));
         limitCol.setCellValueFactory(new PropertyValueFactory<>("limit"));

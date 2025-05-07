@@ -99,7 +99,7 @@ public class TransactionsController {
         // 3) Remove any stray blank columns, set proportional resize
         table.getColumns().removeIf(c -> c.getText()==null || c.getText().isBlank());
         table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        dateCol.prefWidthProperty().bind(table.widthProperty().multiply(0.10));
+        dateCol.prefWidthProperty().bind(table.widthProperty().multiply(0.15));
         descCol.prefWidthProperty().bind(table.widthProperty().multiply(0.40));
         catCol .prefWidthProperty().bind(table.widthProperty().multiply(0.25));
         amtCol .prefWidthProperty().bind(table.widthProperty().multiply(0.25));
