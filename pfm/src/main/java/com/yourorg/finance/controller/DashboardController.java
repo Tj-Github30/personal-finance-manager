@@ -10,7 +10,9 @@ import com.yourorg.finance.util.EventBus;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
@@ -162,6 +164,15 @@ public class DashboardController {
                             pieData.add(new PieChart.Data(cat, Math.abs(sum)))
                     );
             pieChart.setData(pieData);
+            // add tooltips to pie slices
+            for (PieChart.Data data : pieData) {
+                Tooltip tooltip = new Tooltip(
+                        data.getName() + ": " + String.format("%.2f", data.getPieValue())
+                );
+                Tooltip.install(data.getNode(), tooltip);
+                tooltip.setStyle("-fx-background-color: white; -fx-text-fill: black; -fx-border-color: #ddd; -fx-padding: 8; -fx-background-radius: 6;");
+            }
+
 
             // ─ C) Line ────────────────────────────────
             NumberAxis x = (NumberAxis)lineChart.getXAxis();
@@ -179,6 +190,16 @@ public class DashboardController {
                             )
                     ));
             lineChart.getData().setAll(series);
+            // add tooltips to line chart data points
+            for (XYChart.Data<Number, Number> data : series.getData()) {
+                Tooltip tooltip = new Tooltip(
+                        "Day: " + data.getXValue() + "\n" +
+                                "Amount: $" + String.format("%.2f", data.getYValue())
+                );
+                Tooltip.install(data.getNode(), tooltip);
+                tooltip.setStyle("-fx-background-color: white; -fx-text-fill: black; -fx-border-color: #ddd; -fx-padding: 8; -fx-background-radius: 6;");
+            }
+
 
             // ─ D) Recent ──────────────────────────────
             var recent = filtered.stream()
