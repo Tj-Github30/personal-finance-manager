@@ -34,7 +34,7 @@ public class MainApp extends Application {
 
 
 
-        // 7) Set stage
+        // 5) Set stage
         stage.setTitle("PFM Welcome");
         stage.setScene(scene);
         stage.show();
