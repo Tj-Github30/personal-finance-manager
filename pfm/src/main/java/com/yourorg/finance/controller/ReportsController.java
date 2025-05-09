@@ -14,10 +14,7 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.SQLException;
@@ -124,6 +121,16 @@ public class ReportsController {
                 series.getData().add(new XYChart.Data<>(r.getCategory(), r.getVariance()));
             }
             varianceChart.getData().setAll(series);
+            // 6) add tooltips to each bar
+            for (XYChart.Data<String, Number> data : series.getData()) {
+                Tooltip tooltip = new Tooltip(
+                        "Category: " + data.getXValue() + "\n" +
+                                "Variance: " + data.getYValue()
+                );
+                Tooltip.install(data.getNode(), tooltip);
+                tooltip.setStyle("-fx-background-color: white; -fx-text-fill: black; -fx-border-color: #ddd; -fx-padding: 8; -fx-background-radius: 6;");
+            }
+
 
         } catch (SQLException ex) {
             ex.printStackTrace();
